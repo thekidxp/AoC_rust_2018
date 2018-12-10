@@ -1,19 +1,16 @@
-use std::{
-    fs::File, 
-    io::prelude::*, 
-    collections::HashSet,
-};
+use std::{collections::HashSet, fs::File, io::prelude::*};
 
 fn main() {
     const FILE_PATH: &str = "./input_day_1";
     let mut file = File::open(FILE_PATH).expect("Failed to open file.");
     let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Couldn't read file");
+    file.read_to_string(&mut contents)
+        .expect("Couldn't read file");
 
     let numbers: Vec<isize> = contents.lines().map(|l| l.parse().unwrap()).collect();
 
     let first_number = first_part(&numbers);
-    
+
     println!("total = {}", first_number);
 
     let second_number = second_part(&numbers);
