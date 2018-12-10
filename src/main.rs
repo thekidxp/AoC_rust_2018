@@ -1,65 +1,54 @@
-use std::{fs::File, io::prelude::*};
+use std::{
+    fs::File, 
+    io::prelude::*, 
+    collections::HashSet,
+};
 
 fn main() {
     const FILE_PATH: &str = "./input_day_1";
     let mut file = File::open(FILE_PATH).expect("Failed to open file.");
     let mut contents = String::new();
-    file.read_to_string(&mut contents)
-        .expect("Couldn't read file");
+    file.read_to_string(&mut contents).expect("Couldn't read file");
 
-    let numbers: Vec<&str> = contents.split('\n').collect();
+    let numbers: Vec<isize> = contents.lines().map(|l| l.parse().unwrap()).collect();
 
-    let mut total = 0;
+    let first_number = first_part(&numbers);
+    
+    println!("total = {}", first_number);
 
-    let mut frequencies: Vec<i64> = Vec::new();
-
-    for number in numbers {
-        match number.parse() {
-            Ok(num) => {
-                frequencies.push(num);
-                total += num;
-            }
-            _ => {}
-        };
-    }
-    println!("total = {}", total);
-
-    let second_number = second_part(frequencies);
+    let second_number = second_part(&numbers);
     println!("total = {}", second_number);
 }
 
-fn second_part(frequencies: Vec<i64>) -> i64 {
-    let mut running_total: Vec<i64> = Vec::new();
-    let mut current_total: i64 = 0;
-    let mut match_found = false;
-    let mut count = 0;
+fn first_part(input: &[isize]) -> isize {
+    input.iter().sum()
+}
 
-    while !match_found {
-        let frequency: i64 = *frequencies.get(count).unwrap();
-        match running_total.last() {
-            None => current_total = frequency,
-            Some(number) => current_total = number + frequency,
+fn second_part(input: &[isize]) -> isize {
+    let mut freq_repeated = 0;
+    let mut frequencies = HashSet::new();
+    frequencies.insert(freq_repeated);
+
+    for num in input.iter().cycle() {
+        freq_repeated += num;
+        if frequencies.contains(&freq_repeated) {
+            return freq_repeated;
         }
 
-        if running_total.contains(&current_total) {
-            match_found = true;
-        } else {
-            running_total.push(current_total);
-        }
-
-        if count == frequencies.len() - 1 {
-            count = 0;
-        } else {
-            count += 1;
-        }
+        frequencies.insert(freq_repeated);
     }
-
-    current_total
+    unreachable!()
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
-    fn second_test() {}
+    fn second_test() {
+        assert_eq!(second_part(&vec![1, -1]), 0);
+        assert_eq!(second_part(&vec![3, 3, 4, -2, -4]), 10);
+        assert_eq!(second_part(&vec![-6, 3, 8, 5, -6]), 5);
+        assert_eq!(second_part(&vec![7, 7, -2, -7, -4]), 14);
+    }
 }
